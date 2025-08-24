@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Search Results - Domain Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00a4bd, #00838f);
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .search-container {
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+
+        .search-box {
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+
+        .search-btn {
+            padding: 15px 30px;
+            background: #00a4bd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .results-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .domain-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .domain-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .domain-info {
+            flex: 1;
+        }
+
+        .domain-name {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .domain-price {
+            font-size: 1.5rem;
+            color: #00a4bd;
+            font-weight: bold;
+        }
+
+        .add-to-cart {
+            padding: 10px 20px;
+            background: #00a4bd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background: #008c9e;
+        }
+
+        .cart-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .unavailable {
+            background: #f8f8f8;
+        }
+
+        .unavailable .domain-price {
+            color: #999;
+        }
+
+        .unavailable .add-to-cart {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .similar-domains {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f0f9fa;
+            border-radius: 10px;
+        }
+
+        .similar-domains h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">Domain Finder</a>
+    </header>
+
+    <div class="cart-icon" onclick="location.href='cart.html'">
+        🛒 <span id="cart-count">0</span>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" class="search-input" id="domain-search" placeholder="Search another domain...">
+            <button class="search-btn" onclick="searchDomain()">Search</button>
+        </div>
+    </div>
+
+    <div class="results-container" id="results">
+        <!-- Results will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // Domain extensions and prices
+        const extensions = [
+            {ext: '.com', price: 12.99},
+            {ext: '.net', price: 11.99},
+            {ext: '.org', price: 13.99},
+            {ext: '.io', price: 39.99},
+            {ext: '.co', price: 24.99}
+        ];
+
+        function generateResults(domain) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            // Generate main domain results
+            extensions.forEach(({ext, price}) => {
+                const isAvailable = Math.random() > 0.3; // Randomly determine availability
+                const domainCard = `
+                    <div class="domain-card ${!isAvailable ? 'unavailable' : ''}">
+                        <div class="domain-info">
+                            <div class="domain-name">${domain}${ext}</div>
+                            <div class="domain-price">$${price}/year</div>
+                        </div>
+                        <button class="add-to-cart" 
+                                onclick="addToCart('${domain}${ext}', ${price})"
+                                ${!isAvailable ? 'disabled' : ''}>
+                            ${isAvailable ? 'Add to Cart' : 'Unavailable'}
+                        </button>
+                    </div>
+                `;
+                resultsContainer.innerHTML += domainCard;
+            });
+
+            // Generate similar domain suggestions
+            const similarDomains = generateSimilarDomains(domain);
+            resultsContainer.innerHTML += `
+                <div class="similar-domains">
+                    <h3>Similar Domains</h3>
+                    ${similarDomains}
+                </div>
+            `;
+        }
+
+        function generateSimilarDomains(domain) {
+            const suggestions = [
+                `my${domain}`,
+                `${domain}online`,
+                `get${domain}`,
+                `the${domain}`
+            ];
+
+            return suggestions.map(suggestion => `
+                <div class="domain-card">
+                    <div class="domain-info">
+                        <div class="domain-name">${suggestion}.com</div>
+                        <div class="domain-price">$12.99/year</div>
+                    </div>
+                    <button class="add-to-cart" 
+                            onclick="addToCart('${suggestion}.com', 12.99)">
+                        Add to Cart
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(domain, price) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.push({domain, price});
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            alert(`${domain} added to cart!`);
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.getElementById('cart-count').textContent = cart.length;
+        }
+
+        function searchDomain() {
+            const domain = document.getElementById('domain-search').value;
+            if(domain.trim() === '') {
+                alert('Please enter a domain name');
+                return;
+            }
+            localStorage.setItem('searchDomain', domain);
+            generateResults(domain);
+        }
+
+        // On page load
+        window.onload = function() {
+            const searchDomain = localStorage.getItem('searchDomain');
+            if(searchDomain) {
+                document.getElementById('domain-search').value = searchDomain;
+                generateResults(searchDomain);
+            }
+            updateCartCount();
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Domain Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00a4bd, #00838f);
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .cart-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .cart-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .cart-item {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .domain-info {
+            flex: 1;
+        }
+
+        .domain-name {
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .domain-price {
+            font-size: 1.1rem;
+            color: #00a4bd;
+        }
+
+        .remove-btn {
+            padding: 8px 15px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .remove-btn:hover {
+            background: #cc0000;
+        }
+
+        .cart-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00a4bd;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #00a4bd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+
+        .checkout-btn:hover {
+            background: #008c9e;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .continue-shopping {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 10px 20px;
+            background: #00a4bd;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">Domain Finder</a>
+    </header>
+
+    <div class="cart-container" id="cart-container">
+        <h1 class="cart-title">Shopping Cart</h1>
+        <div id="cart-items">
+            <!-- Cart items will be dynamically inserted here -->
+        </div>
+        <div id="cart-summary">
+            <!-- Summary will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        function displayCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartItems = document.getElementById('cart-items');
+            const cartSummary = document.getElementById('cart-summary');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <h2>Your cart is empty</h2>
+                        <p>Find your perfect domain name today!</p>
+                        <a href="index.html" class="continue-shopping">Continue Shopping</a>
+                    </div>
+                `;
+                cartSummary.innerHTML = '';
+                return;
+            }
+
+            // Display cart items
+            cartItems.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <div class="domain-info">
+                        <div class="domain-name">${item.domain}</div>
+                        <div class="domain-price">$${item.price}/year</div>
+                    </div>
+                    <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
+                </div>
+            `).join('');
+
+            // Calculate total
+            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+            const tax = subtotal * 0.1; // 10% tax
+            const total = subtotal + tax;
+
+            // Display summary
+            cartSummary.innerHTML = `
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span>$${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (10%):</span>
+                        <span>$${tax.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span>$${total.toFixed(2)}</span>
+                    </div>
+                    <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
+                </div>
+            `;
+        }
+
+        function removeItem(index) {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+        }
+
+        function checkout() {
+            // Store cart data for the checkout page
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            localStorage.setItem('checkoutCart', JSON.stringify(cart));
+            window.location.href = 'checkout.html';
+        }
+
+        // Display cart on page load
+        window.onload = displayCart;
+    </script>
+</body>
+</html> 

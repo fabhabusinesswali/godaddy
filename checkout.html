@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Domain Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00a4bd, #00838f);
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .checkout-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkout-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .order-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00a4bd;
+            box-shadow: 0 0 0 2px rgba(0,164,189,0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #eee;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #00a4bd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #008c9e;
+        }
+
+        /* Success Message Styles */
+        .success-message {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+
+        .success-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .success-text {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .return-home {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #00a4bd;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .return-home:hover {
+            background: #008c9e;
+        }
+
+        /* Form validation styles */
+        .error {
+            color: #ff4444;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        input:invalid {
+            border-color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="logo">Domain Finder</a>
+    </header>
+
+    <div id="checkout-content">
+        <div class="checkout-container">
+            <div class="checkout-form">
+                <h2 class="section-title">Billing Information</h2>
+                <form id="payment-form" onsubmit="processPayment(event)">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="card">Card Number</label>
+                        <input type="text" id="card" required pattern="[0-9]{16}" placeholder="1234 5678 9012 3456">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="expiry">Expiry Date</label>
+                            <input type="text" id="expiry" required pattern="(0[1-9]|1[0-2])\/[0-9]{2}" placeholder="MM/YY">
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input type="text" id="cvv" required pattern="[0-9]{3,4}" placeholder="123">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Billing Address</label>
+                        <input type="text" id="address" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Complete Purchase</button>
+                </form>
+            </div>
+
+            <div class="order-summary">
+                <h2 class="section-title">Order Summary</h2>
+                <div id="order-items">
+                    <!-- Order items will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function displayOrderSummary() {
+            const cart = JSON.parse(localStorage.getItem('checkoutCart')) || [];
+            const orderItems = document.getElementById('order-items');
+            
+            const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+            const tax = subtotal * 0.1;
+            const total = subtotal + tax;
+
+            const itemsHtml = cart.map(item => `
+                <div class="order-item">
+                    <span>${item.domain}</span>
+                    <span>$${item.price.toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            orderItems.innerHTML = `
+                ${itemsHtml}
+                <div class="order-item">
+                    <span>Subtotal</span>
+                    <span>$${subtotal.toFixed(2)}</span>
+                </div>
+                <div class="order-item">
+                    <span>Tax (10%)</span>
+                    <span>$${tax.toFixed(2)}</span>
+                </div>
+                <div class="total-row">
+                    <span>Total</span>
+                    <span>$${total.toFixed(2)}</span>
+                </div>
+            `;
+        }
+
+        function processPayment(event) {
+            event.preventDefault();
+            
+            // Show success message
+            document.getElementById('checkout-content').innerHTML = `
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <h2 class="success-title">Thank You for Your Purchase!</h2>
+                    <p class="success-text">Your order has been successfully processed. You will receive a confirmation email shortly.</p>
+                    <a href="index.html" class="return-home">Return to Homepage</a>
+                </div>
+            `;
+
+            // Clear cart
+            localStorage.removeItem('cart');
+            localStorage.removeItem('checkoutCart');
+        }
+
+        // Format card number as user types
+        document.getElementById('card').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            if (value.length > 16) value = value.substr(0, 16);
+            e.target.value = value;
+        });
+
+        // Format expiry date as user types
+        document.getElementById('expiry').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substr(0, 2) + '/' + value.substr(2);
+            }
+            e.target.value = value;
+        });
+
+        // Display order summary on page load
+        window.onload = displayOrderSummary;
+    </script>
+</body>
+</html> 
